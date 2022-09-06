@@ -5,7 +5,7 @@ from src.py.read import all_read
 from src.py.plot import plot
 
 model = NeuralNetwork()
-study = Study(model, all_read('video'), 5000, plot(True))
+study = Study(model, all_read('video'), 5000, plot(False))
 loss = 1
 
 epochs = 20

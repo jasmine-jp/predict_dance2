@@ -1,44 +1,39 @@
 import torch
 from torch import nn
 from .common import *
-ians = range(lenA)
-zeros = torch.zeros((1, batch, hidden))
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.s = 'train'
 
         self.conv2d = nn.Sequential(
-            nn.Conv2d(3, channel, second, second),
-            nn.BatchNorm2d(channel),
+            nn.Conv2d(lenA, sec_d, sec_size, sec_size),
+            nn.BatchNorm2d(sec_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
-            nn.Conv2d(channel, 1, third*diff, third*diff),
-            nn.BatchNorm2d(1),
+            nn.Conv2d(sec_d, thr_d, thr_size, thr_size),
+            nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
             nn.Flatten()
         )
 
-        self.rnn = nn.ModuleList(
-            [nn.LSTM(1, hidden, batch_first=True) for _ in ians]
-        )
-        self.hn = nn.ParameterList([nn.Parameter(zeros, False) for _ in ians])
+        enc_layer = nn.TransformerEncoderLayer(out, 2)
+        self.encoder = nn.TransformerEncoder(enc_layer, 1)
+        dec_layer = nn.TransformerDecoderLayer(out, 2)
+        self.decoder = nn.TransformerDecoder(dec_layer, 1)
 
         self.stack = nn.Sequential(
-            nn.Linear(arr_size, lenA)
+            nn.Flatten(),
+            nn.Linear(arr_size*out, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, lenA)
         )
 
     def forward(self, x):
-        self.c = torch.stack(list(map(self.conv2d, x)))
-        self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).sum(0)
-        return self.stack(self.r)
-
-    def arrange(self, r, i):
-        o, hc = r(self.c, (self.hn[i], zeros))
-        self.hn[i].data = hc[0] if self.s == 'train' else self.hn[i]
-        return o[:, :, -1]
-    
-    def setstate(self, s):
-        self.s = s
+        c = torch.stack(list(map(self.conv2d, x)))
+        e = self.encoder(c)
+        d = self.decoder(e, c)
+        return self.stack(d)
