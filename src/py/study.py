@@ -16,6 +16,7 @@ class Study:
 
         for i in tqdm(range(1, d+1)):
             train, teach = self.create_randrange()
+            self.model.setstate('train')
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
 
@@ -35,6 +36,7 @@ class Study:
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach = self.create_randrange()
+                self.model.setstate('test')
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
 
