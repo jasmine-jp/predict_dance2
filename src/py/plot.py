@@ -6,8 +6,8 @@ class plot:
         self.test = False
         self.execute = execute
 
-    def saveimg(self, model, ans, idx):
-        conv, rnn = model.c[0].detach().clone(), model.r[0].detach().clone()
+    def saveimg(self, c, r, ans, idx):
+        conv, rnn = c[0].detach().clone(), r[0].detach().clone()
         fig = plt.figure(figsize=(12.8, 4.8))
         fig.suptitle(f'{ans[0]}')
         ax1 = fig.add_subplot(1, 2, 1)
