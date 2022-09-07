@@ -15,6 +15,8 @@ plz check tree down below.
 ├── archive
 │   ├── *.mp4 (for stock)
 ├── out
+│   ├── edited
+│   │   ├── *.mp4 (you can see edited video)
 │   ├── img (result's graph store automatically in this directory)
 │   │   ├── epoch_1
 │   │   │   ├── estimate_1.png

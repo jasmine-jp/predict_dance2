@@ -2,10 +2,11 @@ import cv2, os, pickle, numpy as np
 from tqdm import tqdm
 from .common import size, arr_size, ansmap, lenA
 
-def read(name, terdir):
+def read(name, terdir, frag):
     name = name.split('.')[0]
     pkl = 'out/src/{}.pkl'.format(name)
     video = '{}/{}.mp4'.format(terdir, name)
+    edited = 'out/edited/{}.mp4'.format(name)
 
     cap = cv2.VideoCapture(video)
     arr = np.array([])
@@ -15,12 +16,16 @@ def read(name, terdir):
     h_ma = int((h-w)/2) if w < h else 0
     w_ma = int((w-h)/2) if w > h else 0
 
-    if not os.path.isfile(pkl):
+    fmt = cv2.VideoWriter_fourcc('m','p','4','v')
+    writer = cv2.VideoWriter(edited,fmt,cap.get(cv2.CAP_PROP_FPS),(size, size))
+
+    if frag or not os.path.isfile(pkl):
         print('dumping '+video)
         with open(pkl, 'wb') as f:
             for _ in tqdm(range(frame_count)):
                 _, frame = cap.read()
                 frame = cv2.resize(frame[h_ma:h-h_ma, w_ma:w-w_ma], dsize=(size, size))
+                writer.write(frame)
                 frame = np.array([cv2.split(frame)])
                 arr = frame if arr.size == 0 else np.append(arr, frame, axis=0)
             pickle.dump(arr, f)
@@ -29,12 +34,12 @@ def read(name, terdir):
     with open(pkl, 'rb') as f:
         return pickle.load(f)
 
-def all_read(name):
-    if input('update data [y/n]: ') == 'y':
+def all_read(name, force=False):
+    if force if force else input('update data [y/n]: ') == 'y':
         data, teachs, plot = np.array([]), np.array([]), np.array([])
         other = [0 for _ in range(lenA-1)]+[1]
         for s in os.listdir(name):
-            arr = read(s, name)
+            arr = read(s, name, force)
             data = arr if data.size == 0 else np.append(data, arr, axis=0)
             teach = np.array([ansmap.get(s.split('_')[-1].replace('.mp4', ''), other) for _ in range(len(arr)-arr_size)])
             teachs = teach if teachs.size == 0 else np.append(teachs, teach, axis=0)
