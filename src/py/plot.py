@@ -14,8 +14,9 @@ class plot:
         ax2 = fig.add_subplot(1, 2, 2)
         ax1.set_title('conv')
         ax2.set_title('rnn')
-        ax1.plot(list(map(float, conv)))
-        ax2.plot(list(map(float, rnn)))
+        ax1.plot(list(map(float, conv.mean(1))))
+        for r in rnn:
+            ax2.plot(list(map(float, r)))
         s = 'test' if self.test else 'epoch_'+str(self.epoch)
         plt.close(fig)
         fig.savefig(f'out/img/{s}/estimate_{idx}')

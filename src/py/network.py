@@ -21,33 +21,30 @@ class NeuralNetwork(nn.Module):
             nn.Flatten()
         )
 
-        enc_layer = nn.TransformerEncoderLayer(out,2,batch_first=True)
-        self.encoder = nn.TransformerEncoder(enc_layer, 1)
+        self.el = nn.TransformerEncoderLayer(out,1,batch_first=True)
+        self.dl = nn.TransformerDecoderLayer(out,1,batch_first=True)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])
 
-        dec_layer = nn.TransformerDecoderLayer(arr_size,2,batch_first=True)
-        self.decoder = nn.TransformerDecoder(dec_layer, 1)
-
         self.stack = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(lenA*arr_size, 16),
+            nn.Linear(lenA*arr_size, 32),
             nn.ReLU(),
-            nn.Linear(16, 16),
+            nn.Linear(32, 32),
             nn.ReLU(),
-            nn.Linear(16, lenA)
+            nn.Linear(32, lenA),
+            nn.Softmax(1)
         )
 
     def forward(self, x):
-        c = torch.stack(list(map(self.conv2d, x)))
-        self.e = self.encoder(c)
-        r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
-        d = self.decoder(r, self.e.transpose(1,2))
-        return self.stack(d)
+        self.c = torch.stack(list(map(self.conv2d, x)))
+        self.d = self.dl(self.c, self.el(self.c))
+        self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
+        return self.stack(self.r)
 
     def arrange(self, r, i):
-        o, hn = r(self.e, self.hn[i])
+        o, hn = r(self.d, self.hn[i])
         self.hn[i].data = hn if self.s == 'train' else self.hn[i]
         return o[:, :, -1]
 
