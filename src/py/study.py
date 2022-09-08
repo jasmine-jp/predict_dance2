@@ -24,7 +24,7 @@ class Study:
             loss.backward()
             self.optimizer.step()
 
-            if (i % 300 == 0 or i == 0) and self.p.execute:
+            if (i % 300 == 0 or i == 1) and self.p.execute:
                 self.p.saveimg(self.model.c, self.model.r, teach, i)
 
     def test(self):
@@ -43,7 +43,7 @@ class Study:
                 for m, t in zip(pred.argmax(dim=1), teach):
                     co, psum[m], ans = co+t[m], psum[m]+1, ans+t
 
-                if (i % 100 == 0 or i == 0) and self.p.execute:
+                if (i % 100 == 0 or i == 1) and self.p.execute:
                     self.p.saveimg(self.model.c, self.model.r, teach, i)
 
             self.test_loss, co = self.test_loss/d, co/d/batch
