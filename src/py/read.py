@@ -3,10 +3,9 @@ from tqdm import tqdm
 from .common import size, arr_size, ansmap, lenA
 
 def read(name, terdir, frag):
-    name = name.split('.')[0]
-    pkl = 'out/src/{}.pkl'.format(name)
-    video = '{}/{}.mp4'.format(terdir, name)
-    edited = 'out/edited/{}.mp4'.format(name)
+    pkl = f'out/src/{name}.pkl'
+    video = f'{terdir}/{name}.mp4'
+    edited = f'out/edited/{name}.mp4'
 
     cap = cv2.VideoCapture(video)
     arr = np.array([])
@@ -39,18 +38,20 @@ def all_read(name, force=False):
         data, teachs, plot = np.array([]), np.array([]), np.array([])
         other = [0 for _ in range(lenA-1)]+[1]
         for s in os.listdir(name):
+            s = s.replace('.mp4', '')
             arr = read(s, name, force)
             data = arr if data.size == 0 else np.append(data, arr, axis=0)
-            teach = np.array([ansmap.get(s.split('_')[-1].replace('.mp4', ''), other) for _ in range(len(arr)-arr_size)])
+            s = s.split('_')[-1]
+            teach = np.array([ansmap.get(s, other) for _ in range(len(arr)-arr_size)])
             teachs = teach if teachs.size == 0 else np.append(teachs, teach, axis=0)
             plot = np.append(plot, len(data)-arr_size)
-        with open('out/model/{}_read.pkl'.format(name), 'wb') as f:
-            print('dumping '+'out/model/{}_read.pkl'.format(name))
+        with open(f'out/model/{name}_read.pkl', 'wb') as f:
+            print('dumping '+f'out/model/{name}_read.pkl')
             pickle.dump((data, teachs, plot), f)
         return data, teachs, plot
     else:
-        with open('out/model/{}_read.pkl'.format(name), 'rb') as f:
-            print('loading '+'out/model/{}_read.pkl'.format(name))
+        with open(f'out/model/{name}_read.pkl', 'rb') as f:
+            print('loading '+f'out/model/{name}_read.pkl')
             return pickle.load(f)
 
 def test_read():
