@@ -39,12 +39,12 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         self.c = torch.stack(list(map(self.conv2d, x)))
-        self.d = self.dl(self.c, self.el(self.c))
+        self.c = self.dl(self.c, self.el(self.c))
         self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
         return self.stack(self.r)
 
     def arrange(self, r, i):
-        o, hn = r(self.d, self.hn[i])
+        o, hn = r(self.c, self.hn[i])
         self.hn[i].data = hn if self.s == 'train' else self.hn[i]
         return o[:, :, -1]
 

@@ -1,5 +1,3 @@
-from sympy import factorint
-
 ansmap = {
     'elegant': [1, 0, 0],
     'dance': [0, 1, 0]
