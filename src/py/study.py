@@ -16,7 +16,6 @@ class Study:
 
         for i in tqdm(range(1, d+1)):
             train, teach = self.create_randrange()
-            self.model.setstate('train')
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
 
@@ -25,7 +24,7 @@ class Study:
             self.optimizer.step()
 
             if (i % 300 == 0 or i == 1) and self.p.execute:
-                self.p.saveimg(self.model.c, self.model.r, teach, i)
+                self.p.saveimg(self.model.c, self.model.e, teach, i)
 
     def test(self):
         self.p.test, d = True, int(self.diff[1])
@@ -36,7 +35,6 @@ class Study:
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach = self.create_randrange()
-                self.model.setstate('test')
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
 
@@ -44,7 +42,7 @@ class Study:
                     co, psum[m], ans = co+t[m], psum[m]+1, ans+t
 
                 if (i % 100 == 0 or i == 1) and self.p.execute:
-                    self.p.saveimg(self.model.c, self.model.r, teach, i)
+                    self.p.saveimg(self.model.c, self.model.e, teach, i)
 
             self.test_loss, co = self.test_loss/d, co/d/batch
             print(f'Accuracy: {(100*co):>0.1f}%, Avg loss: {self.test_loss:>8f}')
