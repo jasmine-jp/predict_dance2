@@ -15,11 +15,10 @@ def read(name, terdir, frag):
     h_ma = int((h-w)/2) if w < h else 0
     w_ma = int((w-h)/2) if w > h else 0
 
-    fmt = cv2.VideoWriter_fourcc('m','p','4','v')
-    writer = cv2.VideoWriter(edited,fmt,cap.get(cv2.CAP_PROP_FPS),(size, size))
-
     if frag or not os.path.isfile(pkl):
         print('dumping '+video)
+        fmt = cv2.VideoWriter_fourcc('m','p','4','v')
+        writer = cv2.VideoWriter(edited,fmt,cap.get(cv2.CAP_PROP_FPS),(size, size))
         with open(pkl, 'wb') as f:
             for _ in tqdm(range(frame_count)):
                 _, frame = cap.read()
