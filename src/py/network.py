@@ -10,11 +10,9 @@ class NeuralNetwork(nn.Module):
 
         self.conv2d = nn.Sequential(
             nn.Conv2d(lenA, sec_d, sec_size, sec_size),
-            nn.BatchNorm2d(sec_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
             nn.Conv2d(sec_d, thr_d, thr_size, thr_size),
-            nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
             nn.Flatten()

@@ -23,9 +23,13 @@ def read(name, terdir, frag):
             for _ in tqdm(range(frame_count)):
                 _, frame = cap.read()
                 frame = cv2.resize(frame[h_ma:h-h_ma, w_ma:w-w_ma], dsize=(size, size))
-                writer.write(frame)
                 frame = np.array([cv2.split(frame)])
                 arr = frame if arr.size == 0 else np.append(arr, frame, axis=0)
+            print('editting '+video)
+            for i in tqdm(range(frame_count)):
+                m = arr.mean(0,int)
+                arr[i] = np.abs(arr[i]-m).clip(0, m//2)
+                writer.write(cv2.merge(arr[i]))
             pickle.dump(arr, f)
 
     print('loading '+pkl)
