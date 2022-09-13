@@ -11,24 +11,26 @@ def read(name, terdir, frag):
     arr = np.array([])
 
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    w,h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     h_ma = int((h-w)/2) if w < h else 0
     w_ma = int((w-h)/2) if w > h else 0
 
     if frag or not os.path.isfile(pkl):
         print('dumping '+video)
         fmt = cv2.VideoWriter_fourcc('m','p','4','v')
-        writer = cv2.VideoWriter(edited,fmt,cap.get(cv2.CAP_PROP_FPS),(size, size))
+        writer = cv2.VideoWriter(edited,fmt,cap.get(cv2.CAP_PROP_FPS),(size,size),0)
         with open(pkl, 'wb') as f:
             for _ in tqdm(range(frame_count)):
                 _, frame = cap.read()
                 frame = cv2.resize(frame[h_ma:h-h_ma, w_ma:w-w_ma], dsize=(size, size))
-                frame = np.array([cv2.split(frame)])
-                arr = frame if arr.size == 0 else np.append(arr, frame, axis=0)
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                gray = np.array([cv2.split(gray)])
+                arr = gray if arr.size == 0 else np.append(arr, gray, axis=0)
             print('editting '+video)
+            om = arr.mean(0)
             for i in tqdm(range(frame_count)):
-                m = arr.mean(0,int)
-                arr[i] = np.abs(arr[i]-m).clip(0, m//2)
+                ab = np.abs(arr[i]-om)
+                arr[i] = np.where((om/4<ab) & (ab<om), 255, 0)
                 writer.write(cv2.merge(arr[i]))
             pickle.dump(arr, f)
 
