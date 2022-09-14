@@ -1,7 +1,7 @@
 import torch
 from src.py.study import Study
 from src.py.network import NeuralNetwork
-from src.py.read import all_read
+from src.py.common import all_read
 from src.py.plot import plot
 
 model = NeuralNetwork()
