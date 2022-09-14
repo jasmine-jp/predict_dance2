@@ -27,10 +27,21 @@ def read(name, terdir, frag):
                 gray = np.array([cv2.split(gray)])
                 arr = gray if arr.size == 0 else np.append(arr, gray, axis=0)
             print('editting '+video)
-            om = arr.mean(0)
+            all_m = arr.mean(0)
             for i in tqdm(range(frame_count)):
-                ab = np.abs(arr[i]-om)
-                arr[i] = np.where((om/4<ab) & (ab<om), 255, 0)
+                ab = np.abs(arr[i]-all_m)
+                arr[i] = np.where((all_m/4<ab) & (ab<all_m), 255, 0)
+            bin_sort = np.argsort(np.abs(arr.mean(0)-255/2), axis=None)
+            tar0, tar1, tar2 = np.unravel_index(bin_sort, (1,size,size))
+            for i in tqdm(range(frame_count)):
+                cond = 500
+                for n, (d0,d1,d2) in enumerate(zip(tar0,tar1,tar2)):
+                    if arr[i,d0,d1,d2] == 0:
+                        cond += 1
+                    elif n == cond:
+                        target = (tar0[:cond],tar1[:cond],tar2[:cond])
+                        break
+                arr[i], arr[i][target] = 0, arr[i][target]
                 writer.write(cv2.merge(arr[i]))
             pickle.dump(arr, f)
 
