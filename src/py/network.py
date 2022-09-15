@@ -10,15 +10,15 @@ class NeuralNetwork(nn.Module):
 
         self.conv2d = nn.Sequential(
             nn.Conv2d(1, sec_d, sec_size, sec_size),
-            nn.BatchNorm2d(sec_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
             nn.Conv2d(sec_d, thr_d, thr_size, thr_size),
-            nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
             nn.Flatten()
         )
+
+        self.el = nn.TransformerEncoderLayer(out,2,batch_first=True)
 
         self.stack = nn.Sequential(
             nn.Flatten(),
@@ -32,4 +32,5 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         self.c = torch.stack(list(map(self.conv2d, x)))
-        return self.stack(self.c)
+        self.e = self.el(self.c)
+        return self.stack(self.e)
