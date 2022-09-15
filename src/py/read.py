@@ -48,9 +48,7 @@ class Read:
         fmt = cv2.VideoWriter_fourcc('m','p','4','v')
         writer = cv2.VideoWriter(edited, fmt, self.fps, self.size, 0)
 
-        for i in tqdm(range(self.frame_count)):
-            m = arr[i].mean()
-            arr[i] = np.where((m/4<arr[i]) & (arr[i]<m), 255, 0)
+        arr = np.where(arr<=arr.mean((1,2,3)).reshape((-1,1,1,1)),255,0).astype(np.uint8)
         bin_sort = np.argsort(np.abs(arr.mean(0)-255/4), axis=None)
         tar0, tar1, tar2 = np.unravel_index(bin_sort, arr.shape[1:])
 
@@ -58,7 +56,7 @@ class Read:
             for n, (d0,d1,d2) in enumerate(zip(tar0,tar1,tar2)):
                 if arr[i,d0,d1,d2] == 0:
                     rang += 1
-                elif n == rang:
+                if n == rang or n == np.prod(self.size)-1:
                     target = tuple(map(lambda e: e[:n],(tar0,tar1,tar2)))
                     rang = initial_rang
                     break
