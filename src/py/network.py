@@ -1,8 +1,6 @@
 import torch
 from torch import nn
 from .common import *
-ians = range(lenA)
-zeros = torch.zeros((1, batch, hidden))
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
