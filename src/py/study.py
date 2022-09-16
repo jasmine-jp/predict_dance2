@@ -4,8 +4,8 @@ from .common import arr_size, lenA, batch
 
 class Study:
     def __init__(self, model, read, diff, p):
-        self.loss_fn = torch.nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(model.parameters())
+        self.loss_fn = torch.nn.HuberLoss()
+        self.optimizer = torch.optim.RAdam(model.parameters())
         self.model, self.p = model, p
         self.data, self.teach, self.plot = read
         self.diff = np.array([len(self.teach)-diff, diff])/batch
@@ -16,6 +16,8 @@ class Study:
 
         for i in tqdm(range(1, d+1)):
             train, teach = self.create_randrange()
+            self.model.setstate('train')
+
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
 
@@ -35,6 +37,8 @@ class Study:
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach = self.create_randrange()
+                self.model.setstate('train')
+
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
 
