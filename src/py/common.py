@@ -10,7 +10,7 @@ size, arr_size, pool = 64, 30, 2
 diff, last = size/(pool**2)/(el**0.5), 2
 sec_d, thr_d = int(out/el/2), int(out/el)
 sec_size, thr_size = int(diff/last), last
-batch, hidden = 10, arr_size
+batch, hidden = 100, int(arr_size/5)
 
 def all_read(dirname, force=False):
     r = Read(dirname, size, force)

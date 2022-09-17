@@ -21,8 +21,8 @@ class NeuralNetwork(nn.Module):
             nn.Flatten()
         ) for _ in range(batch)])
 
-        e = nn.TransformerEncoderLayer(out,1,batch_first=True)
-        self.encoder = nn.TransformerEncoder(e, 2)
+        e = nn.TransformerEncoderLayer(out,4,batch_first=True)
+        self.encoder = nn.TransformerEncoder(e, 1)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])

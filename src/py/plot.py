@@ -17,7 +17,7 @@ class plot:
         ax2.set_title('encode')
         ax3.set_title('rnn')
         ax1.plot(list(map(float, conv.mean(1))))
-        ax2.plot(list(map(float, enc.mean(1))))
+        ax2.plot(list(map(float, enc.transpose(0,1).mean(1))))
         for r in rnn:
             ax3.plot(list(map(float, r)))
         s = 'test' if self.test else 'epoch_'+str(self.epoch)
