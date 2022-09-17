@@ -22,16 +22,16 @@ class NeuralNetwork(nn.Module):
         ) for _ in range(batch)])
 
         e = nn.TransformerEncoderLayer(out,4,batch_first=True)
-        self.encoder = nn.TransformerEncoder(e, 1)
+        self.encoder = nn.TransformerEncoder(e, 2)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])
 
         self.stack = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(lenA*arr_size, 16),
+            nn.Linear(lenA*arr_size, 32),
             nn.ReLU(),
-            nn.Linear(16, 8),
+            nn.Linear(32, 8),
             nn.ReLU(),
             nn.Linear(8, lenA),
             nn.Softmax(1)
@@ -42,7 +42,7 @@ class NeuralNetwork(nn.Module):
         self.e = self.encoder(self.c)
         self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
         return self.stack(self.r)
-    
+
     def arrange(self, r, i):
         o, hn = r(self.e, self.hn[i])
         self.hn[i].data = hn if self.s == 'train' else self.hn[i]

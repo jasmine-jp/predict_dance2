@@ -4,8 +4,8 @@ from .common import arr_size, lenA, batch
 
 class Study:
     def __init__(self, model, read, diff, p):
-        self.loss_fn = torch.nn.HuberLoss()
-        self.optimizer = torch.optim.RAdam(model.parameters())
+        self.loss_fn = torch.nn.SmoothL1Loss()
+        self.optimizer = torch.optim.RAdam(model.parameters(),lr=1e-4)
         self.model, self.p = model, p
         self.data, self.teach, self.plot = read
         self.diff = np.array([len(self.teach)-diff, diff])/batch
@@ -37,7 +37,7 @@ class Study:
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach = self.create_randrange()
-                self.model.setstate('train')
+                self.model.setstate('test')
 
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
