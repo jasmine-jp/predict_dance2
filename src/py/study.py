@@ -26,7 +26,7 @@ class Study:
             self.optimizer.step()
 
             if (i % 300 == 0 or i == 1) and self.p.execute:
-                self.p.saveimg(self.model.c, self.model.e, teach, i)
+                self.p.saveimg(self.model, teach, i)
 
     def test(self):
         self.p.test, d = True, int(self.diff[1])
@@ -46,7 +46,7 @@ class Study:
                     co, psum[m], ans = co+t[m], psum[m]+1, ans+t
 
                 if (i % 100 == 0 or i == 1) and self.p.execute:
-                    self.p.saveimg(self.model.c, self.model.e, teach, i)
+                    self.p.saveimg(self.model, teach, i)
 
             self.test_loss, co = self.test_loss/d, co/d/batch
             print(f'Accuracy: {(100*co):>0.1f}%, Avg loss: {self.test_loss:>8f}')
