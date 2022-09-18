@@ -18,10 +18,11 @@ class NeuralNetwork(nn.Module):
             nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
-            nn.Flatten()
+            nn.Flatten(),
+            nn.Dropout(0.5)
         ) for _ in range(batch)])
 
-        e = nn.TransformerEncoderLayer(out,4,batch_first=True)
+        e = nn.TransformerEncoderLayer(out,8,batch_first=True)
         self.encoder = nn.TransformerEncoder(e, 2)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
