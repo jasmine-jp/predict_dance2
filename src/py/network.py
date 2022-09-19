@@ -22,7 +22,7 @@ class NeuralNetwork(nn.Module):
         ) for _ in range(batch)])
 
         e = nn.TransformerEncoderLayer(out,8,batch_first=True)
-        self.encoder = nn.TransformerEncoder(e, 3)
+        self.encoder = nn.TransformerEncoder(e, 2)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])
