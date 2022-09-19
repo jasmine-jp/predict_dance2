@@ -7,7 +7,7 @@ class Study:
         self.loss_fn = torch.nn.SmoothL1Loss()
         self.optimizer = torch.optim.RAdam(model.parameters())
         self.model, self.p = model, p
-        self.data, self.teach, self.plot = read
+        self.data, self.teach, self.plot, self.sound = read
         self.diff = np.array([len(self.teach)-diff, diff])/batch
 
     def train(self):

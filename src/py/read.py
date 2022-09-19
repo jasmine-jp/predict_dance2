@@ -1,4 +1,4 @@
-import cv2, os, pickle, numpy as np
+import cv2, os, pickle, librosa, ffmpeg as fp, numpy as np
 from tqdm import tqdm
 initial_rang = 500
 
@@ -11,22 +11,35 @@ class Read:
     def read(self, filename):
         arr = np.array([])
         video = f'{self.dirname}/{filename}.mp4'
-        pkl = f'out/src/{filename}.pkl'
+        vpkl = f'out/src/video/{filename}.pkl'
+        sound = f'out/edited/sound/{filename}.mp3'
+        spkl = f'out/src/sound/{filename}.pkl'
 
-        if self.force or not os.path.isfile(pkl):
+        if self.force or not os.path.isfile(vpkl):
             self.cap = cv2.VideoCapture(video)
             self.frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
-            with open(pkl, 'wb') as f:
+            with open(vpkl, 'wb') as f:
                 arr = self.RGB2GRAY(filename, arr)
                 arr = self.GRAY2BIN(filename, arr)
                 pickle.dump(arr, f)
-        print('loading '+pkl)
-        with open(pkl, 'rb') as f:
-            return pickle.load(f)
+
+        if self.force or not os.path.isfile(spkl):
+            print('making mp3 from', video)
+            fp.run(fp.output(fp.input(video),sound),quiet=True,overwrite_output=True)
+            y, _ = librosa.load(sound)
+            rest = 735*self.frame_count-len(y)
+            y = np.append(y,[0 for _ in range(rest)]) if rest>0 else y[:735*self.frame_count]
+            y = y.reshape((self.frame_count, -1))
+            with open(spkl, 'wb') as f:
+                pickle.dump(y, f)
+
+        print('loading', vpkl, 'and', spkl)
+        with open(vpkl, 'rb') as v, open(spkl, 'rb') as s:
+            return pickle.load(v), pickle.load(s)
 
     def RGB2GRAY(self, name, arr):
-        print('dumping '+ f'{self.dirname}/{name}.mp4')
+        print('be gray', f'{self.dirname}/{name}.mp4')
 
         w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -42,8 +55,8 @@ class Read:
         return arr
 
     def GRAY2BIN(self, name, arr, rang=initial_rang):
-        print('editting '+ f'{self.dirname}/{name}.mp4')
-        edited = f'out/edited/{name}.mp4'
+        print('editting', f'{self.dirname}/{name}.mp4')
+        edited = f'out/edited/video/{name}.mp4'
 
         fmt = cv2.VideoWriter_fourcc('m','p','4','v')
         writer = cv2.VideoWriter(edited, fmt, self.fps, self.size, 0)

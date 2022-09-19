@@ -5,3 +5,5 @@ matplotlib
 sympy
 tqdm
 torchinfo
+ffmpeg-python
+librosa

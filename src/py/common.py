@@ -15,27 +15,28 @@ batch, hidden = 100, arr_size
 def all_read(dirname, force=False):
     r = Read(dirname, size, force)
     if force if force else input('update data [y/n]: ') == 'y':
-        data, teachs, plot = np.array([]), np.array([]), np.array([])
+        data, teachs, plot, sounds = [np.array([]) for _ in range(4)]
         other = [0 for _ in range(lenA-1)]+[1]
         for filename in os.listdir(dirname):
             filename = filename.replace('.mp4', '')
-            arr = r.read(filename)
+            arr, sound = r.read(filename)
             data = arr if data.size == 0 else np.append(data, arr, axis=0)
+            sounds = sound if sounds.size == 0 else np.append(sounds, sound, axis=0)
             filename = filename.split('_')[-1]
             teach = np.array([ansmap.get(filename, other) for _ in range(len(arr)-arr_size)])
             teachs = teach if teachs.size == 0 else np.append(teachs, teach, axis=0)
             plot = np.append(plot, len(data)-arr_size)
         with open(f'out/model/{dirname}_read.pkl', 'wb') as f:
-            print('dumping '+ f'out/model/{dirname}_read.pkl')
-            pickle.dump((data, teachs, plot), f)
+            print('dumping', f'out/model/{dirname}_read.pkl')
+            pickle.dump((data, teachs, plot, sounds), f)
     with open(f'out/model/{dirname}_read.pkl', 'rb') as f:
-        print('loading '+ f'out/model/{dirname}_read.pkl')
+        print('loading', f'out/model/{dirname}_read.pkl')
         return pickle.load(f)
 
 def test_read():
     if input('read video data [y/n]: ') == 'y':
         with open('out/model/video_read.pkl', 'rb') as f:
-            print('loading '+'out/model/video_read.pkl')
+            print('loading', 'out/model/video_read.pkl')
             return pickle.load(f)
     else:
         return all_read('test')
