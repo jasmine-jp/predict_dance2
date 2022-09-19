@@ -15,7 +15,7 @@ batch, hidden = 100, arr_size
 def all_read(dirname, force=False):
     r = Read(dirname, size, force)
     if force if force else input('update data [y/n]: ') == 'y':
-        data, teachs, plot = np.array([]), np.array([]), np.array([])
+        data, teachs, div = np.array([]), np.array([]), np.array([])
         other = [0 for _ in range(lenA-1)]+[1]
         for filename in os.listdir(dirname):
             filename = filename.replace('.mp4', '')
@@ -24,10 +24,10 @@ def all_read(dirname, force=False):
             filename = filename.split('_')[-1]
             teach = np.array([ansmap.get(filename, other) for _ in range(len(arr)-arr_size)])
             teachs = teach if teachs.size == 0 else np.append(teachs, teach, axis=0)
-            plot = np.append(plot, len(data)-arr_size)
+            div = np.append(div, len(data)-arr_size)
         with open(f'out/model/{dirname}_read.pkl', 'wb') as f:
             print('dumping '+ f'out/model/{dirname}_read.pkl')
-            pickle.dump((data, teachs, plot), f)
+            pickle.dump((data, teachs, div), f)
     with open(f'out/model/{dirname}_read.pkl', 'rb') as f:
         print('loading '+ f'out/model/{dirname}_read.pkl')
         return pickle.load(f)
