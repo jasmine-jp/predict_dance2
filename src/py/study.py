@@ -5,7 +5,7 @@ from .common import arr_size, lenA, batch
 class Study:
     def __init__(self, model, read, diff, p):
         self.loss_fn = torch.nn.SmoothL1Loss()
-        self.optimizer = torch.optim.RAdam(model.parameters(),lr=1e-4)
+        self.optimizer = torch.optim.RAdam(model.parameters())
         self.model, self.p = model, p
         self.data, self.teach, self.plot = read
         self.diff = np.array([len(self.teach)-diff, diff])/batch
@@ -14,9 +14,9 @@ class Study:
         self.p.test, d = False, int(self.diff[0])
         print('train')
 
+        self.model.train()
         for i in tqdm(range(1, d+1)):
             train, teach = self.create_randrange()
-            self.model.setstate('train')
 
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
@@ -25,7 +25,7 @@ class Study:
             loss.backward()
             self.optimizer.step()
 
-            if (i % 300 == 0 or i == 1) and self.p.execute:
+            if (i % (3000/batch) == 0 or i == 1) and self.p.execute:
                 self.p.saveimg(self.model, teach, i)
 
     def test(self):
@@ -34,10 +34,10 @@ class Study:
         psum, ans = [torch.zeros(lenA) for _ in range(2)]
         print('test')
 
+        self.model.eval()
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach = self.create_randrange()
-                self.model.setstate('test')
 
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
@@ -45,7 +45,7 @@ class Study:
                 for m, t in zip(pred.argmax(dim=1), teach):
                     co, psum[m], ans = co+t[m], psum[m]+1, ans+t
 
-                if (i % 100 == 0 or i == 1) and self.p.execute:
+                if (i % (1000/batch) == 0 or i == 1) and self.p.execute:
                     self.p.saveimg(self.model, teach, i)
 
             self.test_loss, co = self.test_loss/d, co/d/batch

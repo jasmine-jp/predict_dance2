@@ -7,7 +7,6 @@ zeros = torch.zeros((1, batch, hidden))
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.s = 'train'
 
         self.cl = nn.ModuleList([nn.Sequential(
             nn.Conv2d(1, sec_d, sec_size, sec_size),
@@ -19,11 +18,11 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(pool),
             nn.Flatten(),
-            nn.Dropout(0.5)
+            nn.Dropout(0.2)
         ) for _ in range(batch)])
 
         e = nn.TransformerEncoderLayer(out,8,batch_first=True)
-        self.encoder = nn.TransformerEncoder(e, 2)
+        self.encoder = nn.TransformerEncoder(e, 3)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])
@@ -45,9 +44,6 @@ class NeuralNetwork(nn.Module):
         return self.stack(self.r)
 
     def arrange(self, r, i):
-        o, hn = r(self.e, self.hn[i])
-        self.hn[i].data = hn if self.s == 'train' else self.hn[i]
+        o, hn = r(self.c, self.hn[i])
+        self.hn[i].data = hn if self.training else self.hn[i]
         return o[:, :, -1]
-
-    def setstate(self, s):
-        self.s = s

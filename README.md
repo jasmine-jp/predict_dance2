@@ -10,26 +10,22 @@ next, you need to create directories.<br>
 plz check tree down below.
 <pre>
 .
-├── __pycache__
-│   ├── *.pyc
 ├── archive
 │   ├── *.mp4 (for stock)
 ├── out
 │   ├── edited
-│   │   ├── *.mp4 (you can see edited video)
-│   ├── img (result's graph store automatically in this directory)
-│   │   ├── epoch_1
-│   │   │   ├── estimate_1.png
-│   │   │   ├── ... (you can create png desirable cycle)
-│   │   ├── epoch_n (you should create n files same as epoch num)
+│   │   ├── *.mp4
+│   ├── img (this directory is created automatically)
+│   │   ├── epoch_n
 │   │   │   ├── ...
-│   │   └── test (this files exist to store graph that is result each of test)
-│   │       ├── estimate_1.png
-│   │       ├── ...
-│   ├── model (models store automatically in this directory)
+│   ├── model
 │   │   ├── ...
-│   └── src (video deta store automatically in this directory)
+│   └── src
 │       ├── ...
+├── src
+│   ├── py
+│   │   ├── __pycache__
+│   │   │   ├── *.pyc
 ├── test
 │   ├── *.mp4 (for test)
 └── video

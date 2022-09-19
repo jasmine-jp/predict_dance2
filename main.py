@@ -1,4 +1,4 @@
-import torch
+import os, shutil, torch
 from src.py.study import Study
 from src.py.network import NeuralNetwork
 from src.py.common import all_read
@@ -9,9 +9,13 @@ study = Study(model, all_read('video'), 5000, plot(True))
 loss = 1
 
 epochs = 20
-for t in range(epochs):
-    print(f'Epoch {t+1}\n-------------------------------')
-    study.p.epoch = t+1
+shutil.rmtree('out/img', ignore_errors=True)
+os.mkdir('out/img')
+os.mkdir(f'out/img/test')
+for idx in range(1, epochs+1):
+    print(f'Epoch {idx}\n-------------------------------')
+    os.mkdir(f'out/img/epoch_{idx}')
+    study.p.epoch = idx
     study.train()
     study.test()
     if loss > study.test_loss:
