@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from .common import *
-ians, emsize, reng = range(lenA), int(out/2), 3700
+ians, reng = range(lenA), 3700
 zeros = torch.zeros((1, batch, hidden))
 
 class NeuralNetwork(nn.Module):
@@ -18,16 +18,15 @@ class NeuralNetwork(nn.Module):
             nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
-            nn.Flatten()
+            nn.Flatten(),
+            nn.Dropout(0.2)
         ) for _ in range(batch)])
 
-        self.embedding = nn.Embedding(reng, emsize)
-        t = out + emsize
+        self.embedding = nn.Embedding(reng, out)
+        e = nn.TransformerEncoderLayer(out, 8, batch_first=True)
+        self.encoder = nn.TransformerEncoder(e, 2)
 
-        e = nn.TransformerEncoderLayer(t, 8, batch_first=True)
-        self.encoder = nn.TransformerEncoder(e, 3)
-
-        self.rnn = nn.ModuleList([nn.GRU(t,hidden,batch_first=True) for _ in ians])
+        self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])
 
         self.stack = nn.Sequential(
@@ -42,7 +41,7 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         self.c = torch.stack(list(map(lambda conv, e: conv(e), self.convL, x)))
-        self.e = self.encoder(torch.cat((self.embedding(self.pos), self.c), dim=2))
+        self.e = self.encoder(self.embedding(self.pos) + self.c)
         self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
         return self.stack(self.r)
 
