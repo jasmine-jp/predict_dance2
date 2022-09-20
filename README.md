@@ -6,6 +6,13 @@ you should type this command.
 ```
 pip install -r src/git/requirements.txt
 ```
+and you should install **ffmpeg**, **librosa**.
+```
+brew install ffmpeg
+```
+```
+brew install libsndfile
+```
 next, you need to create directories.<br>
 plz check tree down below.
 <pre>
@@ -14,18 +21,20 @@ plz check tree down below.
 │   ├── *.mp4 (for stock)
 ├── out
 │   ├── edited
-│   │   ├── *.mp4
+│   │   ├── sound
+│   │   │   ├── *.mp3
+│   │   ├── video
+│   │   │   ├── *.mp4
 │   ├── img (this directory is created automatically)
 │   │   ├── epoch_n
-│   │   │   ├── ...
+│   │   │   ├── *.png
 │   ├── model
-│   │   ├── ...
+│   │   ├── *.pkl
 │   └── src
-│       ├── ...
-├── src
-│   ├── py
-│   │   ├── __pycache__
-│   │   │   ├── *.pyc
+│   │   ├── sound
+│   │   │   ├── *.pkl
+│   │   ├── video
+│   │   │   ├── *.pkl
 ├── test
 │   ├── *.mp4 (for test)
 └── video
