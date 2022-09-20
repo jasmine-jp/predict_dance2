@@ -44,6 +44,6 @@ class NeuralNetwork(nn.Module):
         return self.stack(self.r)
 
     def arrange(self, r, i):
-        o, hn = r(self.c, self.hn[i])
+        o, hn = r(self.e, self.hn[i])
         self.hn[i].data = hn if self.training else self.hn[i]
         return o[:, :, -1]
