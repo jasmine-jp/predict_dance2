@@ -25,17 +25,17 @@ class NeuralNetwork(nn.Module):
         self.sound_conv = nn.Sequential(
             nn.Conv1d(arr_size, 45, 2, 2),
             nn.BatchNorm1d(45),
-            nn.ReLU(),
-            nn.MaxPool1d(2),
+            nn.Tanh(),
+            nn.AvgPool1d(2),
             nn.Conv1d(45, arr_size, 2, 2),
             nn.BatchNorm1d(arr_size),
-            nn.ReLU(),
-            nn.MaxPool1d(2),
+            nn.Tanh(),
+            nn.AvgPool1d(2),
             nn.Dropout(0.2)
         )
 
-        e = nn.TransformerEncoderLayer(out,8,batch_first=True)
-        self.encoder = nn.TransformerEncoder(e, 2)
+        e = nn.TransformerEncoderLayer(out,8,batch_first=True,norm_first=True)
+        self.encoder = nn.TransformerEncoder(e, 6)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
         self.hn = nn.ParameterList([nn.Parameter(zeros) for _ in ians])
@@ -52,7 +52,8 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         self.c = torch.stack(list(map(lambda c, e: c(e), self.video_conv, x)))
-        self.e = self.encoder(self.sound_conv(self.sound) + self.c)
+        self.s = self.sound_conv(self.sound)
+        self.e = self.encoder(self.s + self.c)
         self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
         return self.stack(self.r)
 
