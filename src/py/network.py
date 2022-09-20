@@ -7,6 +7,7 @@ zeros = torch.zeros((1, batch, hidden))
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
+        self.sound = torch.zeros((batch, arr_size, sound_size))
 
         self.cl = nn.ModuleList([nn.Sequential(
             nn.Conv2d(1, sec_d, sec_size, sec_size),
@@ -47,3 +48,7 @@ class NeuralNetwork(nn.Module):
         o, hn = r(self.c, self.hn[i])
         self.hn[i].data = hn if self.training else self.hn[i]
         return o[:, :, -1]
+    
+    def setstate(self, sound):
+        self.sound = sound
+        print(self.sound.shape)

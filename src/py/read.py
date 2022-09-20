@@ -1,6 +1,7 @@
 import cv2, os, pickle, librosa, ffmpeg as fp, numpy as np
 from tqdm import tqdm
 initial_rang = 500
+sound_size = 735
 
 class Read:
     def __init__(self, dirname, size, force):
@@ -28,8 +29,8 @@ class Read:
             print('making mp3 from', video)
             fp.run(fp.output(fp.input(video),sound),quiet=True,overwrite_output=True)
             y, _ = librosa.load(sound)
-            rest = 735*self.frame_count-len(y)
-            y = np.append(y,[0 for _ in range(rest)]) if rest>0 else y[:735*self.frame_count]
+            long = sound_size*self.frame_count
+            y = np.append(y,[0 for _ in range(long-len(y))]) if long-len(y)>0 else y[:long]
             y = y.reshape((self.frame_count, -1))
             with open(spkl, 'wb') as f:
                 pickle.dump(y, f)

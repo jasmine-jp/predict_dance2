@@ -1,10 +1,10 @@
 import os, pickle, numpy as np
 from .read import Read
 
-ansmap = {
+ansmap, sound_size = {
     'elegant': [1, 0, 0],
     'dance': [0, 1, 0]
-}
+}, 735
 lenA, out, el = len(ansmap)+1, 128, 16
 size, arr_size, pool = 64, 30, 2
 diff, last = size/(pool**2)/(el**0.5), 2

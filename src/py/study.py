@@ -16,7 +16,8 @@ class Study:
 
         self.model.train()
         for i in tqdm(range(1, d+1)):
-            train, teach = self.create_randrange()
+            train, teach, sound = self.create_randrange()
+            self.model.setstate(sound)
 
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
@@ -37,7 +38,8 @@ class Study:
         self.model.eval()
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
-                train, teach = self.create_randrange()
+                train, teach, sound = self.create_randrange()
+                self.model.setstate(sound)
 
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
@@ -58,4 +60,4 @@ class Study:
         trainE = np.array(list(map(lambda e, i: e-arr_size if 0<e-self.plot[i]<arr_size else e, r, idx)))
         trainNum = np.array(list(map(lambda e: np.arange(e, e+arr_size), trainE)))
         teachNum = np.array(list(map(lambda e, i: e-(i if e < self.plot[i] else i+1)*arr_size, trainE, idx)))
-        return torch.Tensor(self.data[trainNum]), torch.Tensor(self.teach[teachNum])
+        return torch.Tensor(self.data[trainNum]), torch.Tensor(self.teach[teachNum]), torch.Tensor(self.sound[trainNum])
