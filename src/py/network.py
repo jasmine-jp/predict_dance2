@@ -18,8 +18,7 @@ class NeuralNetwork(nn.Module):
             nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
-            nn.Flatten(),
-            nn.Dropout(0.2)
+            nn.Flatten()
         ) for _ in range(batch)])
 
         self.sound_conv = nn.Sequential(
@@ -30,11 +29,10 @@ class NeuralNetwork(nn.Module):
             nn.Conv1d(45, arr_size, 2, 2),
             nn.BatchNorm1d(arr_size),
             nn.Tanh(),
-            nn.AvgPool1d(2),
-            nn.Dropout(0.2)
+            nn.AvgPool1d(2)
         )
 
-        e = nn.TransformerEncoderLayer(out,8,batch_first=True,norm_first=True)
+        e = nn.TransformerEncoderLayer(out, 8, batch_first=True, norm_first=True)
         self.encoder = nn.TransformerEncoder(e, 6)
 
         self.rnn = nn.ModuleList([nn.GRU(out,hidden,batch_first=True) for _ in ians])
