@@ -18,10 +18,14 @@ class NeuralNetwork(nn.Module):
             nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
-            nn.Flatten()
+            nn.Flatten(),
+            nn.Dropout(0.2)
         ) for _ in range(batch)])
 
-        self.embedding = nn.Embedding(reng, out)
+        self.embedding = nn.Sequential(
+            nn.Embedding(reng, out),
+            nn.Dropout(0.2)
+        )
         e = nn.TransformerEncoderLayer(out, 8, batch_first=True, norm_first=True)
         self.encoder = nn.TransformerEncoder(e, 6)
 
