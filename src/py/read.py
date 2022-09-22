@@ -11,7 +11,7 @@ class Read:
     def read(self, filename):
         arr = np.array([])
         video = f'{self.dirname}/{filename}.mp4'
-        pkl = f'out/src/{filename}.pkl'
+        pkl = f'out/src/video/{filename}.pkl'
 
         if self.force or not os.path.isfile(pkl):
             self.cap = cv2.VideoCapture(video)
@@ -43,7 +43,7 @@ class Read:
 
     def GRAY2BIN(self, name, arr, rang=initial_rang):
         print('editting '+ f'{self.dirname}/{name}.mp4')
-        edited = f'out/edited/{name}.mp4'
+        edited = f'out/edited/video/{name}.mp4'
 
         fmt = cv2.VideoWriter_fourcc('m','p','4','v')
         writer = cv2.VideoWriter(edited, fmt, self.fps, self.size, 0)
