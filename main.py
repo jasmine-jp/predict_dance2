@@ -14,7 +14,8 @@ os.mkdir('out/img')
 os.mkdir(f'out/img/test')
 for idx in range(1, epochs+1):
     print(f'Epoch {idx}\n-------------------------------')
-    os.mkdir(f'out/img/epoch_{idx}')
+    if study.p.execute:
+        os.mkdir(f'out/img/epoch_{idx}')
     study.p.epoch = idx
     study.train()
     study.test()
