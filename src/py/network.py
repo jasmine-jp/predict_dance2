@@ -31,9 +31,9 @@ class NeuralNetwork(nn.Module):
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 32),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(32, 8),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(8, lenA),
             nn.Softmax(1)
         )
