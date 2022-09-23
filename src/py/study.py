@@ -17,7 +17,7 @@ class Study:
         self.model.train()
         for i in tqdm(range(1, d+1)):
             train, teach, sound = self.create_randrange()
-            self.model.setstate(sound)
+            self.model.setstate(sound, self.pos)
 
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
@@ -39,7 +39,7 @@ class Study:
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach, sound = self.create_randrange()
-                self.model.setstate(sound)
+                self.model.setstate(sound, self.pos)
 
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
@@ -58,6 +58,11 @@ class Study:
         r = np.random.randint(0, len(self.data), batch)
         idx = np.array(list(map(lambda e: np.argmin(np.abs(self.plot-e)), r)))
         trainE = np.array(list(map(lambda e, i: e-arr_size if 0<e-self.plot[i]<arr_size else e, r, idx)))
-        trainNum = np.array(list(map(lambda e: np.arange(e, e+arr_size), trainE)))
-        teachNum = np.array(list(map(lambda e, i: e-(i if e < self.plot[i] else i+1)*arr_size, trainE, idx)))
-        return torch.Tensor(self.data[trainNum]), torch.Tensor(self.teach[teachNum]), torch.Tensor(self.sound[trainNum])
+        trainN = np.array(list(map(lambda e: np.arange(e, e+arr_size), trainE)))
+        teachN = np.array(list(map(lambda e, i: e-(i if e < self.plot[i] else i+1)*arr_size, trainE, idx)))
+        self.pos = np.array(list(map(self.createpos, trainN)))
+        return torch.Tensor(self.data[trainN]), torch.Tensor(self.teach[teachN]), torch.Tensor(self.sound[trainN])
+
+    def createpos(self, n):
+        iarr = np.nonzero(self.div<n[0])[0]
+        return n-(0 if len(iarr) == 0 else self.div[iarr[-1]]+arr_size)

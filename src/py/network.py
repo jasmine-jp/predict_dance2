@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from .common import *
+reng = 3700
 ians = range(lenA)
 zeros = torch.zeros((1, batch, hidden))
 
@@ -8,6 +9,7 @@ class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
         self.sound = torch.zeros((batch, arr_size, sound_size))
+        self.pos = torch.zeros((batch, arr_size), dtype=int)
 
         self.video_conv = nn.ModuleList([nn.Sequential(
             nn.Conv2d(1, sec_d, sec_size, sec_size),
@@ -32,6 +34,7 @@ class NeuralNetwork(nn.Module):
             nn.AvgPool1d(2)
         )
 
+        self.embedding = nn.Embedding(reng, out)
         e = nn.TransformerEncoderLayer(out, 8, batch_first=True, norm_first=True)
         self.encoder = nn.TransformerEncoder(e, 6)
 
@@ -50,15 +53,16 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         self.c = torch.stack(list(map(lambda c, e: c(e), self.video_conv, x)))
+        self.e = self.encoder(self.embedding(self.pos) + self.c)
         self.s = self.sound_conv(self.sound)
-        self.e = self.encoder(self.s + self.c)
         self.r = torch.stack(list(map(self.arrange, self.rnn, ians))).transpose(0,1)
         return self.stack(self.r)
 
     def arrange(self, r, i):
-        o, hn = r(self.e, self.hn[i])
+        o, hn = r(self.e + self.s, self.hn[i])
         self.hn[i].data = hn if self.training else self.hn[i]
         return o[:, :, -1]
 
-    def setstate(self, sound):
+    def setstate(self, sound, pos):
         self.sound = sound
+        self.pos = pos
