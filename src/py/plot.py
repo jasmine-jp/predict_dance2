@@ -12,7 +12,7 @@ class plot:
         fig.suptitle(f'{ans[0]}')
         ax1 = fig.add_subplot(1, 2, 1)
         ax2 = fig.add_subplot(1, 2, 2)
-        ax1.set_title('conv')
+        ax1.set_title('conv + pixel_embedding')
         ax2.set_title('encode')
         ax1.plot(list(map(float, conv.mean(1))))
         ax2.plot(list(map(float, enc.transpose(0,1).mean(1))))

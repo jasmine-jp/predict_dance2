@@ -1,12 +1,11 @@
 import torch
 from torch import nn
 from .common import *
-reng = 3700
+pixel_idx = torch.arange(0,out).repeat(batch*arr_size)
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.pos = torch.zeros((batch, arr_size), dtype=int)
 
         self.convL = nn.ModuleList([nn.Sequential(
             nn.Conv2d(1, sec_d, sec_size, sec_size),
@@ -17,11 +16,16 @@ class NeuralNetwork(nn.Module):
             nn.BatchNorm2d(thr_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
-            nn.Flatten()
+            nn.Flatten(),
+            nn.Dropout(0.5)
         ) for _ in range(batch)])
 
-        self.embedding = nn.Embedding(reng, out)
-        e = nn.TransformerEncoderLayer(out, 8, batch_first=True)
+        self.pixel_embedding = nn.Sequential(
+            nn.Embedding(out, 1),
+            nn.Dropout(0.5)
+        )
+
+        e = nn.TransformerEncoderLayer(out, 2, batch_first=True)
         self.encoder = nn.TransformerEncoder(e, 2)
 
         self.stack = nn.Sequential(
@@ -32,16 +36,17 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 32),
             nn.Tanh(),
+            nn.Dropout(0.2),
             nn.Linear(32, 8),
             nn.Tanh(),
+            nn.Dropout(0.1),
             nn.Linear(8, lenA),
             nn.Softmax(1)
         )
 
     def forward(self, x):
         self.c = torch.stack(list(map(lambda conv, e: conv(e), self.convL, x)))
-        self.e = self.encoder(self.embedding(self.pos) + self.c)
+        embedding = self.pixel_embedding(pixel_idx).reshape(self.c.shape)
+        self.c = embedding + self.c
+        self.e = self.encoder(self.c)
         return self.stack(self.e)
-
-    def setstate(self, pos):
-        self.pos = torch.tensor(pos, dtype=int)

@@ -17,7 +17,6 @@ class Study:
         self.model.train()
         for i in tqdm(range(1, d+1)):
             train, teach = self.create_randrange()
-            self.model.setstate(self.pos)
 
             pred = self.model(train)
             loss = self.loss_fn(pred, teach)
@@ -39,7 +38,6 @@ class Study:
         with torch.no_grad():
             for i in tqdm(range(1, d+1)):
                 train, teach = self.create_randrange()
-                self.model.setstate(self.pos)
 
                 pred = self.model(train)
                 self.test_loss += self.loss_fn(pred, teach).item()
@@ -60,9 +58,4 @@ class Study:
         tE = np.array(list(map(lambda e,i:e-arr_size if 0<e-self.div[i]<arr_size else e,r,idx)))
         trainN = np.array(list(map(lambda e: np.arange(e, e+arr_size), tE)))
         teachN = np.array(list(map(lambda e,i:e-(i if e<self.div[i] else i+1)*arr_size,tE,idx)))
-        self.pos = np.array(list(map(self.createpos, trainN)))
         return torch.Tensor(self.data[trainN]), torch.Tensor(self.teach[teachN])
-
-    def createpos(self, n):
-        iarr = np.nonzero(self.div<n[0])[0]
-        return n-(0 if len(iarr) == 0 else self.div[iarr[-1]]+arr_size)
