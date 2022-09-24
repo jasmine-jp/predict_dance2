@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from .common import *
-pixel_idx = torch.arange(0,out).repeat(batch*arr_size)
+pixel_idx = torch.arange(0,lenE).repeat(batch*arr_size)
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -21,7 +21,7 @@ class NeuralNetwork(nn.Module):
         ) for _ in range(batch)])
 
         self.pixel_embedding = nn.Sequential(
-            nn.Embedding(out, 1),
+            nn.Embedding(lenE, 1),
             nn.Dropout(0.5)
         )
 
@@ -46,7 +46,7 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         self.c = torch.stack(list(map(lambda conv, e: conv(e), self.convL, x)))
-        embedding = self.pixel_embedding(pixel_idx).reshape(self.c.shape)
-        self.c = embedding + self.c
-        self.e = self.encoder(self.c)
+        em = self.pixel_embedding(pixel_idx).reshape(x.shape)
+        self.em = torch.stack(list(map(lambda conv, e: conv(e), self.convL, em)))
+        self.e = self.encoder(self.em + self.c)
         return self.stack(self.e)

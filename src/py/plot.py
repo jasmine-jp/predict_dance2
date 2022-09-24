@@ -7,15 +7,21 @@ class plot:
         self.execute = execute
 
     def saveimg(self, m, ans, idx):
-        conv, enc = map(lambda l: l[0].detach().clone(), (m.c,m.e))
-        fig = plt.figure(figsize=(12, 4), tight_layout=True)
-        fig.suptitle(f'{ans[0]}')
-        ax1 = fig.add_subplot(1, 2, 1)
-        ax2 = fig.add_subplot(1, 2, 2)
-        ax1.set_title('conv + pixel_embedding')
-        ax2.set_title('encode')
-        ax1.plot(list(map(float, conv.mean(1))))
-        ax2.plot(list(map(float, enc.transpose(0,1).mean(1))))
+        conv, em, enc = map(lambda l: l[0].detach().clone(), (m.c,m.em,m.e))
+        self.fig = plt.figure(figsize=(16, 4), tight_layout=True)
+        self.fig.suptitle(f'{ans[0]}')
+        ax1 = self.fig.add_subplot(1, 3, 1)
+        ax2 = self.fig.add_subplot(1, 3, 2)
+        ax3 = self.fig.add_subplot(1, 3, 3)
+        ax1.set_title('conv')
+        ax2.set_title('pixel_embedding')
+        ax3.set_title('encode')
+        self.eachplot((conv, em, enc))
         s = 'test' if self.test else 'epoch_'+str(self.epoch)
-        plt.close(fig)
-        fig.savefig(f'out/img/{s}/estimate_{idx}')
+        plt.close(self.fig)
+        self.fig.savefig(f'out/img/{s}/estimate_{idx}')
+    
+    def eachplot(self, nns):
+        for ax, nn in zip(self.fig.axes, nns):
+            for e in nn.transpose(0,1):
+                ax.plot(list(map(float, e)))
