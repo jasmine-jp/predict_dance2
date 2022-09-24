@@ -10,7 +10,7 @@ size, arr_size, pool = 64, 30, 2
 diff, last = size/(pool**2)/(el**0.5), 2
 sec_d, thr_d = int(out/el/2), int(out/el)
 sec_size, thr_size = int(diff/last), last
-batch, hidden = 100, arr_size
+batch, hidden = 10, arr_size
 
 def all_read(dirname, force=False):
     r = Read(dirname, size, force)
@@ -18,8 +18,6 @@ def all_read(dirname, force=False):
         data, teachs, plot, sounds = [np.array([]) for _ in range(4)]
         other = [0 for _ in range(lenA-1)]+[1]
         for filename in os.listdir(dirname):
-            if filename == '.DS_Store':
-                continue
             filename = filename.replace('.mp4', '')
             arr, sound = r.read(filename)
             data = arr if data.size == 0 else np.append(data, arr, axis=0)

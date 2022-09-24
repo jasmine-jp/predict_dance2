@@ -12,7 +12,7 @@ class NeuralNetwork(nn.Module):
         self.pos = torch.zeros((batch, arr_size), dtype=int)
 
         self.video_conv = nn.ModuleList([nn.Sequential(
-            nn.Conv2d(1, sec_d, sec_size, sec_size),
+            nn.Conv2d(3, sec_d, sec_size, sec_size),
             nn.BatchNorm2d(sec_d),
             nn.ReLU(),
             nn.MaxPool2d(pool),
