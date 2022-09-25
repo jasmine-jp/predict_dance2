@@ -9,7 +9,7 @@ study = Study(model, all_read('video'), 5000, plot(True))
 archive = Study(model, all_read('archive'), 10000, plot(False))
 loss = 1
 
-epochs = 20
+epochs = 10
 shutil.rmtree('out/img', ignore_errors=True)
 os.mkdir('out/img')
 os.mkdir(f'out/img/test')
